@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Absher FlowFix</title>
+<style>
+  body {
+    font-family: "Tahoma", sans-serif;
+    background: linear-gradient(to bottom, #0b8f4d, #13a75a);
+    margin: 0; padding: 0;
+    display: flex; justify-content: center; align-items: center;
+    height: 100vh;
+  }
+  .phone {
+    width: 360px; height: 640px;
+    background: #fff; border-radius: 25px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    overflow: hidden; display: flex; flex-direction: column;
+  }
+  header {
+    background: #0b8f4d; color: #fff;
+    text-align: center; padding: 18px; font-weight: bold;
+  }
+  .content { flex: 1; padding: 20px; text-align: center; overflow-y: auto; }
+  select, button {
+    width: 90%; padding: 10px; border-radius: 10px;
+    border: 1px solid #ccc; margin: 10px 0; font-size: 15px;
+  }
+  button {
+    background: #0b8f4d; color: #fff; border: none; font-weight: bold; cursor: pointer;
+  }
+  .progress { width: 90%; background: #eee; border-radius: 10px; height: 10px; margin: 10px auto; overflow: hidden; }
+  .bar { width: 0; height: 10px; background: #13a75a; transition: width 0.5s; }
+  .result, .solutions {
+    background: #f9f9f9; border-radius: 10px; margin: 15px 0; padding: 10px; display: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: right;
+  }
+  .error { color: red; font-weight: bold; }
+  .ok { color: green; font-weight: bold; }
+  .solution-btn {
+    width: 85%; margin: 5px auto; background: #f1faf5;
+    border: 1px solid #0b8f4d; color: #0b8f4d; padding: 10px;
+    border-radius: 10px; cursor: pointer; font-weight: bold;
+  }
+  footer { text-align: center; padding: 8px; background: #fff; font-size: 12px; color: #777; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <header>Absher FlowFix</header>
+  <div class="content">
+    <h3>الفحص الذكي لتوافق الخدمة</h3>
+    <select id="service">
+      <option>اختر الخدمة</option>
+      <option>نقل الملكية</option>
+      <option>تجديد الهوية الوطنية</option>
+      <option>تحديث العنوان الوطني</option>
+    </select>
+    <button id="startBtn">ابدأ الفحص</button>
+
+    <div class="progress"><div class="bar" id="bar"></div></div>
+
+    <div class="result" id="result">
+      <h4>نتيجة الفحص:</h4>
+      <div id="details"></div>
+      <p id="scoreText" style="margin-top:10px;font-weight:bold;"></p>
+    </div>
+
+    <div class="solutions" id="solutions">
+      <h4>الحلول المقترحة</h4>
+      <button class="solution-btn" onclick="autoFix()">إصلاح تلقائي (AutoFix)</button>
+      <button class="solution-btn" onclick="miniApp()">النسخة المخففة (Mini-App)</button>
+      <button class="solution-btn" onclick="openApp()">فتح الخدمة في تطبيق أبشر</button>
+    </div>
+  </div>
+  <footer>© 2025 Absher FlowFix – نسخة تجريبية للهاكاثون</footer>
+</div>
+
+<script>
+const bar = document.getElementById('bar');
+const result = document.getElementById('result');
+const details = document.getElementById('details');
+const scoreText = document.getElementById('scoreText');
+const solutions = document.getElementById('solutions');
+
+document.getElementById('startBtn').onclick = async () => {
+  const service = document.getElementById('service').value;
+  if (service === "اختر الخدمة") return alert("يرجى اختيار خدمة أولاً");
+  
+  result.style.display = "none";
+  solutions.style.display = "none";
+  details.innerHTML = "";
+  bar.style.width = "0";
+
+  let width = 0;
+  const timer = setInterval(() => {
+    width += 20;
+    bar.style.width = width + "%";
+    if (width >= 100) {
+      clearInterval(timer);
+      runCheck(service);
+    }
+  }, 400);
+};
+
+async function runCheck(service) {
+  let score = 100;
+  let issues = [];
+
+  try { await navigator.mediaDevices.getUserMedia({ video: true });
+    addResult("الكاميرا تعمل", true);
+  } catch { addResult("الكاميرا لا تعمل أو مرفوضة", false); score -= 15; }
+
+  if (window.File && window.FileReader) addResult("رفع الملفات مدعوم", true);
+  else { addResult("رفع الملفات غير مدعوم", false); score -= 10; }
+
+  if (window.RTCPeerConnection) addResult("WebRTC مدعوم", true);
+  else { addResult("WebRTC غير مدعوم", false); score -= 10; }
+
+  const fast = await testSpeed();
+  if (fast) addResult("الإنترنت سريع", true);
+  else { addResult("الإنترنت بطيء", false); score -= 10; }
+
+  const ua = navigator.userAgent;
+  const isChrome = ua.includes("Chrome");
+  if (isChrome) addResult("المتصفح متوافق (Chrome)", true);
+  else { addResult("المتصفح غير موصى به", false); score -= 10; }
+
+  result.style.display = "block";
+  scoreText.innerHTML = `جهازك متوافق بنسبة <strong>${score}%</strong> مع خدمة <strong>${service}</strong>`;
+  solutions.style.display = "block";
+}
+
+function addResult(name, ok) {
+  const line = document.createElement("p");
+  line.innerHTML = `${ok ? "✔️" : "❌"} ${name}`;
+  line.className = ok ? "ok" : "error";
+  details.appendChild(line);
+}
+
+async function testSpeed() {
+  const start = performance.now();
+  try {
+    await fetch("https://www.google.com/favicon.ico", { mode: "no-cors" });
+    const end = performance.now();
+    return end - start < 800;
+  } catch { return false; }
+}
+
+function autoFix() { alert("تم تنفيذ AutoFix بنجاح وإصلاح بعض الإعدادات."); }
+function miniApp() { window.location.href = "mini-app.html"; }
+function openApp() { alert("جاري فتح الخدمة في تطبيق أبشر..."); }
+</script>
+</body>
+</html>

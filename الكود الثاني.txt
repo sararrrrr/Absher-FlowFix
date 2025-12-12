@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>النسخة المخففة – FlowFix</title>
+<style>
+  body {
+    font-family: "Tahoma", sans-serif;
+    background: #f4f9f6;
+    margin: 0; padding: 0;
+    display: flex; justify-content: center; align-items: center;
+    height: 100vh;
+  }
+  .card {
+    width: 340px; background: #fff; border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    text-align: center; padding: 25px;
+  }
+  h2 { color: #0b8f4d; margin-bottom: 15px; }
+  input, button {
+    width: 90%; padding: 10px; margin: 8px 0;
+    border-radius: 10px; border: 1px solid #ccc;
+    font-size: 15px;
+  }
+  button {
+    background: #0b8f4d; color: #fff; border: none;
+    font-weight: bold; cursor: pointer;
+  }
+  button:hover { background: #0a7c44; }
+  .success { color: #0b8f4d; font-weight: bold; margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h2>النسخة المخففة للخدمة</h2>
+  <p>هذه النسخة البسيطة مصممة للأجهزة الضعيفة أو المتصفحات القديمة.</p>
+  <input type="text" placeholder="رقم الهوية الوطنية">
+  <input type="text" placeholder="رقم الجوال">
+  <button onclick="submitForm()">إرسال الطلب</button>
+  <p id="msg" class="success"></p>
+</div>
+
+<script>
+function submitForm(){
+  document.getElementById('msg').innerText = "تم إرسال الطلب بنجاح عبر النسخة المخففة ✅";
+  setTimeout(()=> window.location.href="index.html", 2000);
+}
+</script>
+</body>
+</html>
